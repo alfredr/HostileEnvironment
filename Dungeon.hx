@@ -12,12 +12,12 @@ class Dungeon {
     public var width:Int;
     public var height:Int;
 
-    var _terrain:Array<DungeonCell>;
-    var _moves:Array<Move>;
+    var terrain:Array<DungeonCell>;
+    var moves:Array<Move>;
 
     public function new(width:Int, height:Int) {
-        _terrain = new Array<DungeonCell>();
-        _moves = [
+        terrain = new Array<DungeonCell>();
+        moves = [
             {i:-1, j:0}, {i:1, j:0}, 
             {i:0, j:-1}, {i:0, j:1}
         ]; 
@@ -27,7 +27,7 @@ class Dungeon {
 
         for(i in 0...this.width) {
             for (j in 0...this.height) {
-                _terrain.push({height: 1, visited: false});
+                terrain.push({height: 1, visited: false});
             }
         }
 
@@ -35,16 +35,16 @@ class Dungeon {
     }
 
     private function shuffleMoves():Array<Move> {
-        var moves:Array<Move> = _moves.copy();
+        var shuffMoves:Array<Move> = moves.copy();
 
         for(n in 0...4) {
             var m:Int = Std.random(4);
-            var move:Move = moves[n];
-            moves[n] = moves[m];
-            moves[m] = move;
+            var move:Move = shuffMoves[n];
+            shuffMoves[n] = shuffMoves[m];
+            shuffMoves[m] = move;
         }
 
-        return moves;
+        return shuffMoves;
     }
 
     private function genMaze(i:Int, j:Int) {
@@ -71,6 +71,6 @@ class Dungeon {
     }
 
     public function getCell(i:Int, j:Int):DungeonCell {
-        return _terrain[j*width + i];
+        return terrain[j*width + i];
     }
 }

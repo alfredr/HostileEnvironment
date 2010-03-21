@@ -2,5 +2,3 @@
 -swf9 game.swf
 -swf-header 550:400:1000:000000
 -main Game
-DungeonGenerator
-RobotMesh

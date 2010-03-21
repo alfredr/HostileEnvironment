@@ -1,3 +1,5 @@
+package ;
+
 import sandy.primitive.Primitive3D;
 import sandy.core.scenegraph.Geometry3D;
 import sandy.core.scenegraph.Shape3D;
@@ -776,9 +778,9 @@ class RobotMesh extends Shape3D, implements Primitive3D {
 
 			x = 0.000; y = 0.000; z = 0.000;
 
-			rotateX = 0.000; rotateY = 0.000; rotateZ = 0.000;
+			rotateX = 90.000; rotateY = -0.000; rotateZ = 0.000;
 
-			scaleX = 1.000; scaleY = 1.000; scaleZ = 1.000;
+			scaleX = 1.000; scaleY = 1.000; scaleZ = -1.000;
 
 			
 			return (l);

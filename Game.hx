@@ -23,8 +23,9 @@ import flash.events.KeyboardEvent;
 import flash.ui.Keyboard;
 import flash.Lib;
 
-import DungeonGenerator;
+import Dungeon;
 import RobotMesh;
+import World;
 
 class Game extends Sprite {
 
@@ -38,7 +39,7 @@ class Game extends Sprite {
 
     public function new() {
         super();
-        cellWidth = 5;
+        cellWidth = 1;
         dungeon = new Dungeon(5,5);
 
         initScene();
@@ -56,11 +57,12 @@ class Game extends Sprite {
         var root:Group = createScene();
 
         camera = new Camera3D(550, 400);
-        camera.z = 0 ;
-        camera.y = 30;
+        camera.z = -10 ;
+        camera.y = 15;
+        camera.x = -10 ;
         camera.fov = 30;
         camera.near = 5;
-        camera.lookAt(25,0,25);
+        camera.lookAt(0,0,0);
 
         scene = new Scene3D("scene", this, camera, root);
         
@@ -116,9 +118,9 @@ class Game extends Sprite {
 
         robot = new RobotMesh();
         robot.swapCulling();
-        robot.x = 10;
-        robot.y = 25;
-        robot.z = 10;
+        robot.x = 0;
+        robot.y = 5;
+        robot.z = 0;
         robot.appearance = app;
         tg.addChild(robot);
       
