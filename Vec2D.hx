@@ -51,8 +51,16 @@ class Vec2D {
         return Math.sqrt(this.dot(this));
     }
 
+    public function distanceToLine(axis:Vec2D):Float {
+        return Math.abs(this.cross(axis)/axis.norm());
+    }
+
     public function normalize():Vec2D {
         return this.scale(1/this.norm());
+    }
+
+    public function project(axis:Vec2D):Float {
+        return this.dot(axis)/axis.norm();
     }
 
     public function rotate(angle:Float):Vec2D {
@@ -63,5 +71,9 @@ class Vec2D {
         var ny:Float = x*sin + y*cos;
 
         return new Vec2D(nx, ny);
+    }
+
+    public function toString():String {
+        return "Vec2D("+x+","+y+")";
     }
 }

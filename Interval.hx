@@ -1,3 +1,4 @@
+
 class Interval {
     public var low:Float;
     public var high:Float;
@@ -12,6 +13,10 @@ class Interval {
             high = value;
         if(value < low)
             low = value;
+    }
+
+    public function toString():String {
+        return "["+low+","+high+"]";
     }
 
     public function intersects(range:Interval):Bool {

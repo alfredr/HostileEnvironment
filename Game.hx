@@ -1,5 +1,5 @@
 import sandy.core.Scene3D;
-import sandy.core.scenegraph.Camera3D;
+import sandy.core.scenegraph.SpringCamera3D;
 import sandy.core.scenegraph.Group;
 import sandy.core.scenegraph.TransformGroup;
 
@@ -16,6 +16,7 @@ import sandy.parser.ColladaParser;
 
 import sandy.primitive.Box;
 import sandy.primitive.Plane3D;
+import sandy.primitive.Sphere;
 
 import flash.display.Sprite;
 import flash.events.Event;
@@ -23,17 +24,25 @@ import flash.events.KeyboardEvent;
 import flash.ui.Keyboard;
 import flash.Lib;
 
+import haxe.Log;
+
+import Circle;
 import Dungeon;
+import Enemy;
 import RobotMesh;
+import Vec2D;
 import World;
 
 class Game extends Sprite {
 
     var scene:Scene3D;
-    var camera:Camera3D;
+    var camera:SpringCamera3D;
     var robot:RobotMesh;
     var dungeon:Dungeon;
     var tg:TransformGroup;
+    var world:World;
+    var enemy:Enemy;
+    var enemySphere:Sphere;
 
     var cellWidth:Int;
 
@@ -41,6 +50,11 @@ class Game extends Sprite {
         super();
         cellWidth = 1;
         dungeon = new Dungeon(5,5);
+        world = new World(dungeon);
+        
+        var enemyGeom:Circle = new Circle(new Vec2D(0.5,0.5), 0.05);
+        enemy = new Enemy(enemyGeom, new Vec2D(1,0));
+        world.addEntity(enemy);
 
         initScene();
 
@@ -56,13 +70,19 @@ class Game extends Sprite {
     function initScene():Void {       
         var root:Group = createScene();
 
-        camera = new Camera3D(550, 400);
-        camera.z = -10 ;
-        camera.y = 15;
-        camera.x = -10 ;
-        camera.fov = 30;
-        camera.near = 5;
-        camera.lookAt(0,0,0);
+        camera = new SpringCamera3D(550, 400);
+        camera.positionOffset.z = -5 ;
+        camera.positionOffset.x = -5 ;
+        camera.positionOffset.y = 3;
+        camera.lookOffset.y = -3;
+        camera.lookOffset.x = 3;
+        camera.lookOffset.z = 3;
+        camera.fov = 25;
+        camera.near = 1;
+        camera.mass = 40;
+        camera.damping = 10;
+        camera.z = 0;
+        camera.target = enemySphere;
 
         scene = new Scene3D("scene", this, camera, root);
         
@@ -119,16 +139,25 @@ class Game extends Sprite {
         robot = new RobotMesh();
         robot.swapCulling();
         robot.x = 0;
-        robot.y = 5;
+        robot.y = 0;
         robot.z = 0;
         robot.appearance = app;
-        tg.addChild(robot);
-      
+        //tg.addChild(robot);
+
+        enemySphere = new Sphere("", enemy.geometry.radius, 8, 8);
+        enemySphere.y = enemy.geometry.radius;
+        enemySphere.appearance = app;
+        tg.addChild(enemySphere);
+
         g.addChild(tg);
         return g;
     }
 
     function enterFrameHandler(event:Event):Void {
+        world.tick(0.1);
+        enemy.velocity = 1;
+        enemySphere.x = enemy.geometry.position.x - 0.5;
+        enemySphere.z = enemy.geometry.position.y - 0.5;
         scene.render();
     }
 
@@ -160,6 +189,11 @@ class Game extends Sprite {
     }
 
     static function main() {
+#if (flash9 || flash10)
+        haxe.Log.trace = function(v,?pos) { untyped __global__["trace"](pos.className+"#"+pos.methodName+"("+pos.lineNumber+"):",v); }
+#elseif flash
+        haxe.Log.trace = function(v,?pos) { flash.Lib.trace(pos.className+"#"+pos.methodName+"("+pos.lineNumber+"): "+v); }
+#end
         new Game();
     }
-}
+    }

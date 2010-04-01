@@ -1,6 +1,7 @@
 import Vec2D;
 import Polygon;
 import Constants;
+import Semiplane;
 
 class Circle {
     public var position:Vec2D;
@@ -22,11 +23,11 @@ class Circle {
         return range;
     }
 
-    public function intersectsPolygon(p:Polygon) {
+    public function intersectsPolygon(p:Polygon):Bool {
         return p.intersectsCircle(this);
     }
 
-    public function intersectsCircle(c:Circle) {
+    public function intersectsCircle(c:Circle):Bool {
         var dist:Float = position.sub(c.position).norm();
         
         if(radius + c.radius - dist > C.floatEps)
@@ -34,4 +35,14 @@ class Circle {
 
         return false;
     }
+
+    public function intersectsSemiplane(s:Semiplane):Bool {
+        return s.intersectsCircle(this);
+    }
+
+    public function toString():String {
+        return "Circle("+position.toString()+","+radius+")";
+    }
+
+
 }

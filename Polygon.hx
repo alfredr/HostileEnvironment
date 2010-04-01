@@ -30,6 +30,19 @@ class Polygon {
         sortPoints();
     }
 
+    public function pointInPolygon(p:Vec2D):Bool {
+        for(i in 0...points.length) {
+            var pA:Vec2D = points[i];
+            var pB:Vec2D = points[(i+1) % points.length];
+            var edge:Vec2D = pB.sub(pA);
+            var v:Vec2D = pA.sub(p);
+            if (v.cross(edge) >= 0)
+                return false;
+        }
+
+        return true;
+    }
+
     private function getCentroid():Vec2D {
         var v:Vec2D = new Vec2D(0,0);
 
@@ -60,7 +73,7 @@ class Polygon {
         var range:Interval = new Interval();
 
         for(p in points) {
-            var val:Float = p.norm()*p.cos(v);
+            var val:Float = p.project(v);
             range.addValue(val);
         }
 
@@ -95,6 +108,16 @@ class Polygon {
                 return false;
         }
 
+        trace("INT!");
         return true;
+    }
+
+    public function toString():String {
+        var str:String = "";
+        for(p in points) {
+            str += p.toString();
+        }
+
+        return "Polygon{" + str + "}";
     }
 }

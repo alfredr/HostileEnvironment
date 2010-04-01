@@ -3,7 +3,7 @@ import Dungeon;
 import Vec2D;
 
 class Enemy extends Entity {
-    private static moveRetryCount:Float = 5;
+    private static var moveRetryCount:Int = 5;
 
     public function new(geometry:Circle, orientation:Vec2D) {
         super(geometry, orientation);
@@ -12,7 +12,7 @@ class Enemy extends Entity {
 
     public override function tick(world:World, dt:Float):Void {
         for(i in 0...moveRetryCount) {
-            var newPos:Vec2D = geometry.position + orientation*velocity*dt;
+            var newPos:Vec2D = geometry.position.add(orientation.scale(velocity*dt));
             var target:Circle = new Circle(newPos, geometry.radius);
             
             if(world.moveEntity(this, target))
