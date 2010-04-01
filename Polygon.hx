@@ -30,13 +30,13 @@ class Polygon {
         sortPoints();
     }
 
-    public function pointInPolygon(p:Vec2D):Bool {
+    public function containsPoint(p:Vec2D):Bool {
         for(i in 0...points.length) {
             var pA:Vec2D = points[i];
             var pB:Vec2D = points[(i+1) % points.length];
             var edge:Vec2D = pB.sub(pA);
             var v:Vec2D = pA.sub(p);
-            if (v.cross(edge) >= 0)
+            if (v.cross(edge) <= 0)
                 return false;
         }
 

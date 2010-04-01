@@ -17,7 +17,7 @@ class UnitTests {
 
     public static function pointInPTest() {
         var p:Polygon = new Polygon();
-        var r:Float = 3; 
+        var r:Float = 3.0; 
         for(i in 0...6) {
             var angle:Float = i*2*Math.PI/6;
             var x:Float = r*Math.cos(angle);
@@ -25,21 +25,21 @@ class UnitTests {
             p.addPoint(new Vec2D(x,y));
         }
 
-        var rowCount:Int = 10;
-        var colCount:Int = 10;
+        var rowCount:Int = 50;
+        var colCount:Int = 50;
 
-        var rowStep:Float = 3*r/rowCount;
-        var colStep:Float = 3*r/colCount;
+        var rowStep:Float = 3.0*r/rowCount;
+        var colStep:Float = 3.0*r/colCount;
 
         for(i in 0...rowCount) {
             var row:String = "";
-            var rPos:Float = -1.5*r + i*rowStep;
+            var rPos:Float = 1.5*r - i*rowStep;
             for(j in 0...colCount) {
-                var cPos:Float = 1.5*r - j*colStep;
-                if(p.pointInPolygon(new Vec2D(cPos, rPos)))
-                    row += "X";
+                var cPos:Float = -1.5*r + j*colStep;
+                if(p.containsPoint(new Vec2D(cPos, rPos)))
+                    row += "#";
                 else
-                    row += "O";
+                    row += " ";
             }
             trace(row);
         }
