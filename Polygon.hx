@@ -2,6 +2,7 @@ import Vec2D;
 import Constants;
 import Interval;
 import Circle;
+import Utility;
 
 class Polygon {
     public static function newRectangle(
@@ -27,7 +28,6 @@ class Polygon {
 
     public function addPoint(p:Vec2D):Void {
         points.push(p);
-        sortPoints();
     }
 
     public function containsPoint(p:Vec2D):Bool {
@@ -52,6 +52,75 @@ class Polygon {
         return v.scale(1.0/points.length);
     }
 
+    public function convexHull():Polygon {
+        //Graham Scan
+        var convexPoly:Polygon = new Polygon();
+        
+        if (points.length <= 3) {
+            convexPoly.points = points;
+            return convexPoly;
+        }
+
+        var tmpPoints:Array<Vec2D> = points.copy();
+        tmpPoints.sort(
+            function(p:Vec2D, q:Vec2D):Int {
+                if (Utility.greaterFloat(p.y, q.y))
+                    return 1;
+                if (Utility.lesserFloat(p.y, q.y))
+                    return -1;
+                if (Utility.greaterFloat(p.x, q.x))
+                    return 1;
+                if (Utility.lesserFloat(p.x, q.x))
+                    return -1;
+
+                return 0;
+            }
+        );
+
+        var refPoint:Vec2D = tmpPoints[0];
+        tmpPoints.sort(
+            function(p:Vec2D, q:Vec2D):Int {
+                var angP:Float = refPoint.angle(p);
+                var angQ:Float = refPoint.angle(q);
+
+                if (Utility.greaterFloat(angP, angQ))
+                    return 1;
+                if (Utility.lesserFloat(angP, angQ))
+                    return -1;
+
+                var magP:Float = p.sub(refPoint).norm();
+                var magQ:Float = q.sub(refPoint).norm();
+
+                if (Utility.greaterFloat(magP, magQ))
+                    return 1;
+                if (Utility.lesserFloat(magP, magQ))
+                    return -1;
+
+                return 0;
+            }
+        );
+
+        tmpPoints.push(refPoint);
+        tmpPoints.shift();
+        var convexPoints:Array<Vec2D> = tmpPoints.splice(0, 2);
+        for (ptB in tmpPoints) {
+            var len:Int = convexPoints.length;
+            var ptA:Vec2D = convexPoints[len-1];
+            var o:Vec2D = convexPoints[len-2];
+
+            var v:Vec2D = ptA.sub(o);
+            var w:Vec2D = ptB.sub(o);
+
+            if (v.cross(w) < C.floatEps) 
+                convexPoints.pop();
+            
+            convexPoints.push(ptB);
+        }
+
+        convexPoly.points = convexPoints;
+        return convexPoly;
+    }
+
     private function sortPoints():Void {
         if(points.length == 0)
             return;
@@ -61,9 +130,9 @@ class Polygon {
         points.sort(function(v:Vec2D, w:Vec2D) {
             var angV:Float = refPoint.angle(v);
             var angW:Float = refPoint.angle(w);
-            if (angV - angW > C.floatEps)
+            if (Utility.greaterFloat(angV, angW))
                 return 1;
-            if (angV - angW < -C.floatEps)
+            if (Utility.lesserFloat(angV, angW))
                 return -1;
             return 0;
         }); 

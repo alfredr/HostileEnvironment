@@ -15,6 +15,27 @@ class UnitTests {
         trace (p.project(new Vec2D(1,1)));
     }
 
+    public static function displayPolygon(p:Polygon, 
+        width:Float, height:Float, rowCount:Int, colCount:Int) {
+
+        var rowStep:Float = height/rowCount;
+        var colStep:Float = width/colCount;
+
+        for(i in 0...rowCount) {
+            var row:String = "";
+            var rPos:Float = height/2 - i*rowStep;
+            for(j in 0...colCount) {
+                var cPos:Float = -width/2 + j*colStep;
+                if(p.containsPoint(new Vec2D(cPos, rPos)))
+                    row += "#";
+                else
+                    row += " ";
+            }
+            trace(row);
+        }
+
+    }
+
     public static function pointInPTest() {
         var p:Polygon = new Polygon();
         var r:Float = 3.0; 
@@ -25,30 +46,40 @@ class UnitTests {
             p.addPoint(new Vec2D(x,y));
         }
 
-        var rowCount:Int = 50;
-        var colCount:Int = 50;
+        displayPolygon(p, 3*r, 3*r, 50, 50);
 
-        var rowStep:Float = 3.0*r/rowCount;
-        var colStep:Float = 3.0*r/colCount;
+    }
 
-        for(i in 0...rowCount) {
-            var row:String = "";
-            var rPos:Float = 1.5*r - i*rowStep;
-            for(j in 0...colCount) {
-                var cPos:Float = -1.5*r + j*colStep;
-                if(p.containsPoint(new Vec2D(cPos, rPos)))
-                    row += "#";
-                else
-                    row += " ";
-            }
-            trace(row);
+    public static function convexHullTest() {
+        var p:Polygon = new Polygon();
+        var r:Float = 3.0; 
+        for(i in 0...6) {
+            var angle:Float = i*2*Math.PI/6;
+            var x:Float = r*Math.cos(angle);
+            var y:Float = r*Math.sin(angle);
+        
+            var correctPt:Vec2D = new Vec2D(x,y);
+            var wrongPt:Vec2D = new Vec2D(.8*x, .7*y);
+            p.addPoint(correctPt);
+            p.addPoint(wrongPt);
         }
+
+        for(point in p.points)
+            trace(point.toString());
+
+        var convexPoly:Polygon = p.convexHull();
+        for(point in convexPoly.points)
+            trace(point.toString());
+
+        displayPolygon(convexPoly, 3*r, 3*r, 50, 50);
+   
     }
 
     public static function runTests() {
         circleTests();
         polygonTests();
         pointInPTest();
+        convexHullTest();
     }
 
     public static function main():Void {

@@ -1,6 +1,12 @@
+import sandy.core.data.Matrix4;
+import sandy.core.data.Vertex;
+import sandy.core.data.Point3D;
+
 import sandy.core.Scene3D;
-import sandy.core.scenegraph.SpringCamera3D;
+import sandy.core.scenegraph.Geometry3D;
 import sandy.core.scenegraph.Group;
+import sandy.core.scenegraph.Shape3D;
+import sandy.core.scenegraph.SpringCamera3D;
 import sandy.core.scenegraph.TransformGroup;
 
 import sandy.materials.Appearance;
@@ -29,9 +35,21 @@ import haxe.Log;
 import Circle;
 import Dungeon;
 import Enemy;
+import Polygon;
 import RobotMesh;
 import Vec2D;
 import World;
+
+typedef WallView = {
+    box:Box,
+    isClose:Bool
+};
+
+typedef ZPolygon = {
+    z:Float,
+    polygon:Polygon,
+    box:Box
+};
 
 class Game extends Sprite {
 
@@ -39,15 +57,18 @@ class Game extends Sprite {
     var camera:SpringCamera3D;
     var robot:RobotMesh;
     var dungeon:Dungeon;
+    var walls:Array<WallView>;
     var tg:TransformGroup;
     var world:World;
     var enemy:Enemy;
     var enemySphere:Sphere;
+    var noOcclude:Array<Geometry3D>;
 
     var cellWidth:Int;
 
     public function new() {
         super();
+
         cellWidth = 1;
         dungeon = new Dungeon(5,5);
         world = new World(dungeon);
@@ -56,8 +77,9 @@ class Game extends Sprite {
         enemy = new Enemy(enemyGeom, new Vec2D(1,0));
         world.addEntity(enemy);
 
-        initScene();
+        noOcclude = new Array<Geometry3D>();
 
+        initScene();
         addEventListener(Event.ENTER_FRAME, enterFrameHandler);
         Lib.current.stage.addEventListener(
             KeyboardEvent.KEY_DOWN, 
@@ -80,9 +102,10 @@ class Game extends Sprite {
         camera.fov = 25;
         camera.near = 1;
         camera.mass = 40;
-        camera.damping = 10;
+        camera.damping = 4;
         camera.z = 0;
         camera.target = enemySphere;
+        camera.enableBackFaceCulling = true;
 
         scene = new Scene3D("scene", this, camera, root);
         
@@ -90,7 +113,10 @@ class Game extends Sprite {
 
     function createScene():Group {
         var g:Group = new Group();
+
         tg = new TransformGroup();
+        walls = new Array<WallView>();
+
         var materialAttr:MaterialAttributes = new MaterialAttributes([
             new LineAttributes( 0.5, 0x2111BB, 0.4 ),
             new LightAttributes( true, 0.1 )
@@ -133,6 +159,7 @@ class Game extends Sprite {
                 b.appearance = app;
                 b.useSingleContainer = false;
                 tg.addChild(b);
+                walls.push({box:b, isClose:false});
             }
         }
 
@@ -147,6 +174,8 @@ class Game extends Sprite {
         enemySphere = new Sphere("", enemy.geometry.radius, 8, 8);
         enemySphere.y = enemy.geometry.radius;
         enemySphere.appearance = app;
+        noOcclude.push(enemySphere.geometry);
+
         tg.addChild(enemySphere);
 
         g.addChild(tg);
@@ -154,11 +183,65 @@ class Game extends Sprite {
     }
 
     function enterFrameHandler(event:Event):Void {
-        world.tick(0.1);
         enemy.velocity = 1;
+        world.tick(0.1);
         enemySphere.x = enemy.geometry.position.x - 0.5;
         enemySphere.z = enemy.geometry.position.y - 0.5;
         scene.render();
+        adjustVisibility();
+    }
+
+    function adjustVisibility():Void {
+        var zpolys:Array<ZPolygon> = new Array<ZPolygon>();
+
+        for (wall in walls) {
+            var bestZ:Float = 0;
+            var nVerts:Int = 0;
+            var polygon:Polygon = new Polygon();
+
+            for (vert in wall.box.geometry.aVertex) {
+                if(! vert.transformed)
+                    continue;
+
+                nVerts++;
+                var p:Point3D = vert.getScreenPoint();
+                polygon.addPoint(new Vec2D(p.x, p.y));
+                bestZ += p.z;
+            }
+
+            bestZ = bestZ / nVerts;
+            
+            zpolys.push({z:bestZ, polygon:polygon.convexHull(), box:wall.box});
+        }
+
+        for (geom in noOcclude) {
+            var geomZ:Float = Math.POSITIVE_INFINITY;
+            var geomPoly:Polygon = new Polygon();
+            for(vert in geom.aVertex) {
+                if(!vert.transformed)
+                    continue;
+
+                var p:Point3D = vert.getScreenPoint();
+                geomPoly.addPoint(new Vec2D(p.x, p.y));
+                geomZ = Math.min(geomZ, vert.getScreenPoint().z);
+            }
+
+            geomPoly = geomPoly.convexHull();
+
+            for(zpoly in zpolys) {
+                var materialAttr:MaterialAttributes = new MaterialAttributes([
+                    new LineAttributes( 0.5, 0x2111BB, 0.4 ),
+                    new LightAttributes( true, 0.2 )
+                ]);
+
+                var alpha:Float = if (zpoly.z <= geomZ &&zpoly.polygon.intersectsPolygon(geomPoly)) 0 else 1.0;
+                var material:Material = new ColorMaterial( 0xFFCC33, alpha, materialAttr );
+                material.lightingEnable = true;
+                var app:Appearance = new Appearance( material);
+
+                zpoly.box.appearance = app;
+            }
+        }
     }
 
     function keyPressed(event:KeyboardEvent):Void {
