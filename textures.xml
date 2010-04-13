@@ -1,7 +1,8 @@
 <movie width="800" height="600" framerate="30" version="9">
+    <library>
+        <bitmap id="MetalA" name="MetalA" import="textures/metal01.jpg"/>
+    </library>
+    
     <frame>
-        <library>
-            <bitmap id="metal01" import="textures/metal01.jpg"/>
-        </library>
     </frame>
 </movie>

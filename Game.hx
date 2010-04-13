@@ -11,7 +11,7 @@ import sandy.core.scenegraph.TransformGroup;
 
 import sandy.materials.Appearance;
 import sandy.materials.Material;
-import sandy.materials.ColorMaterial;
+import sandy.materials.BitmapMaterial;
 import sandy.materials.attributes.LightAttributes;
 import sandy.materials.attributes.LineAttributes;
 import sandy.materials.attributes.MaterialAttributes;
@@ -24,6 +24,7 @@ import sandy.primitive.Box;
 import sandy.primitive.Plane3D;
 import sandy.primitive.Sphere;
 
+import flash.display.Bitmap;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.KeyboardEvent;
@@ -63,12 +64,14 @@ class Game extends Sprite {
     var enemy:Enemy;
     var enemySphere:Sphere;
     var noOcclude:Array<Geometry3D>;
+    var wallBmp:Bitmap;
 
     var cellWidth:Int;
 
     public function new() {
         super();
 
+        wallBmp = new Bitmap(new MetalA());
         cellWidth = 1;
         dungeon = new Dungeon(5,5);
         world = new World(dungeon);
@@ -118,12 +121,7 @@ class Game extends Sprite {
         tg = new TransformGroup();
         walls = new Array<WallView>();
 
-        var materialAttr:MaterialAttributes = new MaterialAttributes([
-            new LineAttributes( 0.5, 0x2111BB, 0.4 ),
-            new LightAttributes( true, 0.1 )
-        ]);
-
-        var material:Material = new ColorMaterial( 0xFFCC33, 1, materialAttr );
+        var material:Material = new BitmapMaterial( wallBmp.bitmapData );
         material.lightingEnable = true;
         var app:Appearance = new Appearance( material );
      
@@ -232,13 +230,9 @@ class Game extends Sprite {
             geomPoly = geomPoly.convexHull();
 
             for(zpoly in zpolys) {
-                var materialAttr:MaterialAttributes = new MaterialAttributes([
-                    new LineAttributes( 0.5, 0x2111BB, 0.4 ),
-                    new LightAttributes( true, 0.2 )
-                ]);
-
                 var alpha:Float = if (zpoly.z <= geomZ &&zpoly.polygon.intersectsPolygon(geomPoly)) 0 else 1.0;
-                var material:Material = new ColorMaterial( 0xFFCC33, alpha, materialAttr );
+                var material:BitmapMaterial = new BitmapMaterial( wallBmp.bitmapData );
+                material.alpha = alpha;
                 material.lightingEnable = true;
                 var app:Appearance = new Appearance( material);
 
