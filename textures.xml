@@ -1,6 +1,12 @@
-<movie width="800" height="600" framerate="30" version="9">
+<movie width="800" height="500" framerate="30" version="9">
+    <background color="#000000"/>
     <library>
-        <bitmap id="MetalA" name="MetalA" import="textures/metal01.jpg"/>
+        <bitmap id="BulkheadA" name="BulkheadA" import="textures/BulkheadA.jpg"/>
+        <bitmap id="BulkheadB" name="BulkheadB" import="textures/BulkheadB.jpg"/>
+        <bitmap id="ConcreteA" name="ConcreteA" import="textures/ConcreteA.jpg"/>
+        <bitmap id="MetalA" name="MetalA" import="textures/MetalA.jpg"/>
+        <bitmap id="MetalB" name="MetalB" import="textures/MetalB.jpg"/>
+        <bitmap id="RustA" name="RustA" import="textures/RustA.jpg"/>
     </library>
     
     <frame>

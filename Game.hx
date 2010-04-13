@@ -24,10 +24,14 @@ import sandy.primitive.Box;
 import sandy.primitive.Plane3D;
 import sandy.primitive.Sphere;
 
+import Textures;
+
 import flash.display.Bitmap;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.KeyboardEvent;
+import flash.filters.BitmapFilter;
+import flash.filters.BlurFilter;
 import flash.ui.Keyboard;
 import flash.Lib;
 
@@ -71,7 +75,7 @@ class Game extends Sprite {
     public function new() {
         super();
 
-        wallBmp = new Bitmap(new MetalA());
+        wallBmp = new Bitmap(new ConcreteA());
         cellWidth = 1;
         dungeon = new Dungeon(5,5);
         world = new World(dungeon);
@@ -95,14 +99,14 @@ class Game extends Sprite {
     function initScene():Void {       
         var root:Group = createScene();
 
-        camera = new SpringCamera3D(800, 600);
+        camera = new SpringCamera3D(800, 500);
         //-2.5, 3.5, -2.5
-        camera.positionOffset.z = -5;
-        camera.positionOffset.x = -5;
-        camera.positionOffset.y = 7;
-        camera.lookOffset.y = -7;
-        camera.lookOffset.x = 5;
-        camera.lookOffset.z = 5;
+        camera.positionOffset.z = -2.5;
+        camera.positionOffset.x = -2.5;
+        camera.positionOffset.y = 3.5;
+        camera.lookOffset.y = -3.5;
+        camera.lookOffset.x = 2.5;
+        camera.lookOffset.z = 2.5;
         camera.fov = 25;
         camera.near = 1;
         camera.mass = 40;
@@ -230,8 +234,9 @@ class Game extends Sprite {
             geomPoly = geomPoly.convexHull();
 
             for(zpoly in zpolys) {
-                var alpha:Float = if (zpoly.z <= geomZ &&zpoly.polygon.intersectsPolygon(geomPoly)) 0 else 1.0;
+                var alpha:Float = if (zpoly.z <= geomZ &&zpoly.polygon.intersectsPolygon(geomPoly)) 0.35 else 1.0;
                 var material:BitmapMaterial = new BitmapMaterial( wallBmp.bitmapData );
+                material.setTiling(0.1,0.1);
                 material.alpha = alpha;
                 material.lightingEnable = true;
                 var app:Appearance = new Appearance( material);
