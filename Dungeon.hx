@@ -22,8 +22,8 @@ class Dungeon {
             {i:0, j:-1}, {i:0, j:1}
         ]; 
 
-        this.width = 2*width;
-        this.height = 2*height;
+        this.width = 2*width+1;
+        this.height = 2*height+1;
 
         for(i in 0...this.width) {
             for (j in 0...this.height) {
@@ -31,7 +31,7 @@ class Dungeon {
             }
         }
 
-        genMaze(2,2);
+        genMaze(1,1);
     }
 
     private function shuffleMoves():Array<Move> {

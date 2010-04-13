@@ -1,4 +1,5 @@
 -cp ./
 -swf9 game.swf 
--swf-header 550:400:1000:000000
+-swf-lib textures.swf 
+-swf-header 800:600:32:FF00FF
 -main Game

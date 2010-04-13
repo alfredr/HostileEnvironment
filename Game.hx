@@ -73,7 +73,7 @@ class Game extends Sprite {
         dungeon = new Dungeon(5,5);
         world = new World(dungeon);
         
-        var enemyGeom:Circle = new Circle(new Vec2D(0.5,0.5), 0.05);
+        var enemyGeom:Circle = new Circle(new Vec2D(1.5,1.5), 0.05);
         enemy = new Enemy(enemyGeom, new Vec2D(1,0));
         world.addEntity(enemy);
 
@@ -92,17 +92,18 @@ class Game extends Sprite {
     function initScene():Void {       
         var root:Group = createScene();
 
-        camera = new SpringCamera3D(550, 400);
-        camera.positionOffset.z = -5 ;
-        camera.positionOffset.x = -5 ;
-        camera.positionOffset.y = 3;
-        camera.lookOffset.y = -3;
-        camera.lookOffset.x = 3;
-        camera.lookOffset.z = 3;
+        camera = new SpringCamera3D(800, 600);
+        //-2.5, 3.5, -2.5
+        camera.positionOffset.z = -5;
+        camera.positionOffset.x = -5;
+        camera.positionOffset.y = 7;
+        camera.lookOffset.y = -7;
+        camera.lookOffset.x = 5;
+        camera.lookOffset.z = 5;
         camera.fov = 25;
         camera.near = 1;
         camera.mass = 40;
-        camera.damping = 4;
+        camera.damping = 3;
         camera.z = 0;
         camera.target = enemySphere;
         camera.enableBackFaceCulling = true;
@@ -172,6 +173,8 @@ class Game extends Sprite {
         //tg.addChild(robot);
 
         enemySphere = new Sphere("", enemy.geometry.radius, 8, 8);
+        enemySphere.x = 2;
+        enemySphere.z = 2;
         enemySphere.y = enemy.geometry.radius;
         enemySphere.appearance = app;
         noOcclude.push(enemySphere.geometry);
@@ -183,7 +186,7 @@ class Game extends Sprite {
     }
 
     function enterFrameHandler(event:Event):Void {
-        enemy.velocity = 1;
+        enemy.velocity = 0.75;
         world.tick(0.1);
         enemySphere.x = enemy.geometry.position.x - 0.5;
         enemySphere.z = enemy.geometry.position.y - 0.5;
@@ -279,4 +282,4 @@ class Game extends Sprite {
 #end
         new Game();
     }
-    }
+}

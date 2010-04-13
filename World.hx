@@ -5,7 +5,7 @@ import Semiplane;
 
 class World {
     public var entities:Array<Entity>;
-    var dungeon(default, null):Dungeon;
+    public var dungeon(default, null):Dungeon;
     var dungeonMap:Array<Polygon>;
     var bounds:Array<Semiplane>;
 
