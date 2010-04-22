@@ -1,4 +1,4 @@
 -cp ./
 -swf9 game.swf 
 -swf-lib textures.swf 
--main Game
+-main HostileEnvironment

@@ -1,4 +1,5 @@
 import Dungeon;
+import Textures;
 import World;
 
 import sandy.core.Scene3D;
@@ -7,17 +8,17 @@ import sandy.core.scenegraph.Group;
 import sandy.core.scenegraph.Camera3D;
 import sandy.core.scenegraph.TransformGroup;
 
+import sandy.events.Shape3DEvent;
+
 import sandy.materials.Appearance;
-import sandy.materials.ColorMaterial;
-import sandy.materials.Material;
-import sandy.materials.attributes.LightAttributes;
-import sandy.materials.attributes.LineAttributes;
-import sandy.materials.attributes.MaterialAttributes;
+import sandy.materials.BitmapMaterial;
 
 import sandy.primitive.Box;
 import sandy.primitive.Plane3D;
 
+import flash.display.BitmapData;
 import flash.display.Sprite;
+import flash.events.MouseEvent;
 
 class View extends Sprite {
     var camera:Camera3D;
@@ -30,14 +31,21 @@ class View extends Sprite {
         initScene();
     }
 
+    function newMaterial(texImg:TextureImage):BitmapMaterial {
+        var texMat:BitmapMaterial = new BitmapMaterial(texImg);
+        texMat.lightingEnable = true;
+        texMat.setTiling(texImg.tilingWidth, texImg.tilingHeight);
+        return texMat;
+    }
+
     function initScene():Void {
         var root:Group = createScene();
 
-        camera = new Camera3D(550, 400);
+        camera = new Camera3D(800, 500);
         camera.fov = 25;
         camera.near = 1;
-        camera.z = -60;
-        camera.y = 60;
+        camera.z = -20;
+        camera.y = 10;
         camera.lookAt(0,0,0);
 
         scene = new Scene3D("scene", this, camera, root);
@@ -54,23 +62,27 @@ class View extends Sprite {
         ground.z = -0.5;
         ground.enableForcedDepth = true;
         ground.forcedDepth = 1e9;
-        g.addChild(ground);
 
+        var floorMat = newMaterial(MetalA.instance);
+        ground.appearance = new Appearance(floorMat);
+
+        g.addChild(ground);
         g.addChild(createDungeonWalls());
 
         return g;
     }
 
+    function getCellTexture(cell:DungeonCell):TextureImage {
+        return switch(cell.cellType) {
+            case Wall:
+                ConcreteA.instance;
+            case Floor:
+                ConcreteA.instance;
+        }
+    }
+
     function createDungeonWalls():TransformGroup {
         var g:TransformGroup = new TransformGroup();
-        var materialAttr:MaterialAttributes = new MaterialAttributes([ 
-            new LineAttributes( 0.5, 0x2111BB, 0.4 ),
-            new LightAttributes( true, 0.1)
-        ]);
-
-        var material:Material = new ColorMaterial( 0xFFCC33, 1, materialAttr );
-        material.lightingEnable = true;
-        var app:Appearance = new Appearance( material );
 
         for(i in 0...world.dungeon.width) {
             for(j in 0...world.dungeon.height) {
@@ -79,15 +91,27 @@ class View extends Sprite {
                     continue;
 
                 var b:Box = new Box("Wall", 1, cell.height, 1);
+                
                 b.x = i;
                 b.z = j;
-                b.appearance = app;
+                
+                b.appearance = new Appearance(
+                    newMaterial(getCellTexture(cell))
+                );
+
                 b.useSingleContainer = false;
+                b.enableEvents = true;
+                b.addEventListener(MouseEvent.CLICK, clickHandler);
+
                 g.addChild(b);
             }
         }
         g.translate(-world.dungeon.width/2, 0, -world.dungeon.width/2);
         return g;
+    }
+
+    public function clickHandler(event:Shape3DEvent) {
+        camera.lookAtPoint(event.point);
     }
 
     public function render():Void {

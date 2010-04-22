@@ -1,7 +1,13 @@
+enum CellType {
+    Floor;
+    Wall;
+}
+
 typedef DungeonCell = {
     height:Int,
-    visited:Bool
-}
+    visited:Bool,
+    cellType:CellType
+};
 
 typedef Move = {
     i:Int,
@@ -27,7 +33,11 @@ class Dungeon {
 
         for(i in 0...this.width) {
             for (j in 0...this.height) {
-                terrain.push({height: 1, visited: false});
+                terrain.push({
+                    height: 1, 
+                    visited: false,
+                    cellType: Wall
+                });
             }
         }
 
@@ -64,7 +74,9 @@ class Dungeon {
                 continue;
 
             if(getCell(ni, nj).visited == false) {
-                getCell(i+move.i, j+move.j).height = 0;
+                var cell:DungeonCell = getCell(i+move.i, j+move.j);
+                cell.height = 0;
+                cell.cellType = Floor;
                 genMaze(ni, nj);
             }
         }

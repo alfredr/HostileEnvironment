@@ -236,7 +236,7 @@ class Game extends Sprite {
             for(zpoly in zpolys) {
                 var alpha:Float = if (zpoly.z <= geomZ &&zpoly.polygon.intersectsPolygon(geomPoly)) 0.35 else 1.0;
                 var material:BitmapMaterial = new BitmapMaterial( wallBmp.bitmapData );
-                material.setTiling(0.1,0.1);
+                material.setTiling(0.2,0.2);
                 material.alpha = alpha;
                 material.lightingEnable = true;
                 var app:Appearance = new Appearance( material);
